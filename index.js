@@ -141,7 +141,7 @@ ZigbeeDriver.prototype.begin = function() {
           }
 
           self.log.info('Device found', zigbeeDevice.name + ' ' + zigbeeDevice.profile + ':' + zigbeeDevice.id + ' (' + address + ')');
-
+          self.log.info('ZigBee Headers', headers);
           // Forward all relevant messages from zigbee to our new devices
           var newDevices = createNinjaDevices(address, headers, zigbeeDevice, self.socket);
 
@@ -183,12 +183,12 @@ ZigbeeDriver.prototype.begin = function() {
           return;
         }
         var table = new Table({
-            head: ['Address', 'Profile ID', 'Device ID', 'Driver'],
-            colWidths: [16,16,16,16]
+            head: ['IEEE', 'Address', 'Profile ID', 'Device ID', 'Driver'],
+            colWidths: [24,16,16,16,16]
         });
 
         _.each(devices, function(device) {
-          table.push([device.address, hex(device.zigbeeDevice.profile)||'', hex(device.zigbeeDevice.id)||'', device.driver||'']);
+          table.push([device.ieee.toString(16), device.address, hex(device.zigbeeDevice.profile)||'', hex(device.zigbeeDevice.id)||'', device.driver||'']);
         });
         self.log.info('-- ZigBee Devices --\n' + table.toString());
       }

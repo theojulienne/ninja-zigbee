@@ -9,16 +9,33 @@ var P = require('../lib/protocol');
 
 util.inherits(Device, stream);
 
-function Device(address, headers, zigbeeDevice, socket, driverName) {
+function hexify(number, bits) {
+  var nibbles = bits / 4;
+  
+  var str = number.toString(16).toUpperCase();
+  while (str.length < nibbles) {
+    str = '0' + str;
+  }
+  
+  return str;
+}
 
+function Device(address, headers, zigbeeDevice, socket, driverName) {
+    this.currentAddress = address;
+    
     this._headers = headers;
     this._zigbeeDevice = zigbeeDevice;
     this._socket = socket;
 
-    this.G = address.replace(/[^a-zA-Z0-9]/g, '');
-    this.name = 'ZigBee ' + zigbeeDevice.name + ' (' + address + ')';
+    this.ieee = headers.ieee;
+    
+    var ieeehex = hexify(this.ieee, 64);
 
-    this.log = log4js.getLogger('ZB Device - ' + driverName + ' (' + address + ')');
+    //this.G = address.replace(/[^a-zA-Z0-9]/g, '');
+    this.G = ieeehex;
+    this.name = 'ZigBee ' + zigbeeDevice.name + ' (' + ieeehex + ')';
+
+    this.log = log4js.getLogger('ZB Device - ' + driverName + ' (' + ieeehex + ')');
     this.log.trace('Initialised');
 
     this.on('message', function(address, reader) {
